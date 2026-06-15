@@ -2,7 +2,6 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan.
 
-**Goal:** Add spec and plan document review loops to the brainstorming and writing-plans skills.
 
 **Architecture:** Create reviewer prompt templates in each skill directory. Modify skill files to add review loops after document creation. Use Task tool with general-purpose subagent for reviewer dispatch.
 
@@ -14,12 +13,10 @@
 
 ## Chunk 1: Spec Document Reviewer
 
-This chunk adds the spec document reviewer to the brainstorming skill.
 
 ### Task 1: Create Spec Document Reviewer Prompt Template
 
 **Files:**
-- Create: `skills/brainstorming/spec-document-reviewer-prompt.md`
 
 - [ ] **Step 1:** Create the reviewer prompt template file
 
@@ -75,13 +72,11 @@ Task tool (general-purpose):
 
 - [ ] **Step 2:** Verify the file was created correctly
 
-Run: `cat skills/brainstorming/spec-document-reviewer-prompt.md | head -20`
 Expected: Shows the header and purpose section
 
 - [ ] **Step 3:** Commit
 
 ```bash
-git add skills/brainstorming/spec-document-reviewer-prompt.md
 git commit -m "feat: add spec document reviewer prompt template"
 ```
 
@@ -90,11 +85,8 @@ git commit -m "feat: add spec document reviewer prompt template"
 ### Task 2: Add Review Loop to Brainstorming Skill
 
 **Files:**
-- Modify: `skills/brainstorming/SKILL.md`
 
-- [ ] **Step 1:** Read the current brainstorming skill
 
-Run: `cat skills/brainstorming/SKILL.md`
 
 - [ ] **Step 2:** Add the review loop section after "After the Design"
 
@@ -118,14 +110,11 @@ After writing the spec document:
 
 - [ ] **Step 3:** Verify the changes
 
-Run: `grep -A 15 "Spec Review Loop" skills/brainstorming/SKILL.md`
 Expected: Shows the new review loop section
 
 - [ ] **Step 4:** Commit
 
 ```bash
-git add skills/brainstorming/SKILL.md
-git commit -m "feat: add spec review loop to brainstorming skill"
 ```
 
 ---

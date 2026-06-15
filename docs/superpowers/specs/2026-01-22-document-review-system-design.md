@@ -4,7 +4,6 @@
 
 Add two new review stages to the superpowers workflow:
 
-1. **Spec Document Review** - After brainstorming, before writing-plans
 2. **Plan Document Review** - After writing-plans, before implementation
 
 Both follow the iterative loop pattern used by implementation reviews.
@@ -13,7 +12,6 @@ Both follow the iterative loop pattern used by implementation reviews.
 
 **Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
 
-**Location:** `skills/brainstorming/spec-document-reviewer-prompt.md`
 
 **What it checks for:**
 
@@ -38,9 +36,7 @@ Both follow the iterative loop pattern used by implementation reviews.
 - [suggestions that don't block approval]
 ```
 
-**Review loop:** Issues found -> brainstorming agent fixes -> re-review -> repeat until approved.
 
-**Dispatch mechanism:** Use the Task tool with `subagent_type: general-purpose`. The reviewer prompt template provides the full prompt. The brainstorming skill's controller dispatches the reviewer.
 
 ## Plan Document Reviewer
 
@@ -81,7 +77,6 @@ The reviewer reads both and compares requirements coverage.
 ## Updated Workflow
 
 ```
-brainstorming -> spec -> SPEC REVIEW LOOP -> writing-plans -> plan -> PLAN REVIEW LOOP -> implementation
 ```
 
 **Spec Review Loop:**
@@ -128,9 +123,7 @@ Tasks and steps use checkbox syntax:
 ## Files to Change
 
 **New files:**
-- `skills/brainstorming/spec-document-reviewer-prompt.md`
 - `skills/writing-plans/plan-document-reviewer-prompt.md`
 
 **Modified files:**
-- `skills/brainstorming/SKILL.md` - add review loop after spec written
 - `skills/writing-plans/SKILL.md` - add chunk-by-chunk review loop, update task syntax examples

@@ -4,7 +4,6 @@
 
 ### Removals
 
-- **Legacy slash commands removed** — `/brainstorm`, `/execute-plan`, and `/write-plan` are gone. They were deprecated stubs that did nothing but tell the user to invoke the corresponding skill. Invoke `superpowers:brainstorming`, `superpowers:executing-plans`, and `superpowers:writing-plans` directly instead. (#1188)
 - **`superpowers:code-reviewer` named agent removed** — the agent was the plugin's only named agent and was used by exactly two skills, while every other reviewer/implementer subagent in the repo dispatches `general-purpose` with a prompt template alongside its skill. The agent's persona and checklist have been merged into `skills/requesting-code-review/code-reviewer.md` as a self-contained Task-dispatch template. Anyone dispatching `Task (superpowers:code-reviewer)` should switch to `Task (general-purpose)` with the prompt template instead. (PR #1299)
 - **Integration sections removed from skills** — these were a legacy of the time before agents had native skills systems and didn't help with steering.
 
@@ -25,7 +24,6 @@ Two new sections at the top of `CLAUDE.md` (symlinked to `AGENTS.md`) speak dire
 
 - **Pre-submission checklist** — read the PR template, search for existing PRs, verify a real problem exists, confirm the change belongs in core, and show the human partner the complete diff before submitting.
 - **What we will not accept** — third-party dependencies, "compliance" rewrites of skill content, project-specific configuration, bulk PRs, speculative fixes, domain-specific skills, fork-specific changes, fabricated content, and bundled unrelated changes.
-- **New harness PRs require a session transcript** — most past new-harness integrations copied skill files or wrapped with `npx skills` instead of loading the `using-superpowers` bootstrap at session start. The acceptance test ("Let's make a react todo list" must auto-trigger `brainstorming` in a clean session) and a complete transcript are now required.
 
 ### Codex Plugin Mirror Tooling
 
@@ -103,18 +101,15 @@ New `sync-to-codex-plugin` script mirrors superpowers into the OpenAI Codex plug
 
 The subagent review loop (dispatching a fresh agent to review plans/specs) doubled execution time (~25 min overhead) without measurably improving plan quality. Regression testing across 5 versions with 5 trials each showed identical quality scores regardless of whether the review loop ran.
 
-- **brainstorming** — replaced Spec Review Loop (subagent dispatch + 3-iteration cap) with inline Spec Self-Review checklist: placeholder scan, internal consistency, scope check, ambiguity check
 - **writing-plans** — replaced Plan Review Loop (subagent dispatch + 3-iteration cap) with inline Self-Review checklist: spec coverage, placeholder scan, type consistency
 - **writing-plans** — added explicit "No Placeholders" section defining plan failures (TBD, vague descriptions, undefined references, "similar to Task N")
 - Self-review catches 3-5 real bugs per run in ~30s instead of ~25 min, with comparable defect rates to the subagent approach
 
 ### Brainstorm Server
 
-- **Session directory restructured** — the brainstorm server session directory now contains two peer subdirectories: `content/` (HTML files served to the browser) and `state/` (events, server-info, pid, log). Previously, server state and user interaction data were stored alongside served content, making them accessible over HTTP. The `screen_dir` and `state_dir` paths are both included in the server-started JSON. (Reported by 吉田仁)
 
 ### Bug Fixes
 
-- **Owner-PID lifecycle fixes** — the brainstorm server's owner-PID monitoring had two bugs causing false shutdowns within 60 seconds: (1) EPERM from cross-user PIDs (Tailscale SSH, etc.) was treated as "process dead", and (2) on WSL the grandparent PID resolves to a short-lived subprocess that exits before the first lifecycle check. Fixed by treating EPERM as "alive" and validating the owner PID at startup — if it's already dead, monitoring is disabled and the server relies on the 30-minute idle timeout. This also removes the Windows/MSYS2-specific carve-out from `start-server.sh` since the server now handles it generically. (#879)
 - **writing-skills** — corrected false claim that SKILL.md frontmatter supports "only two fields"; now says "two required fields" and links to the agentskills.io specification for all supported fields (PR #882 by @arittr)
 
 ### Codex App Compatibility
@@ -127,7 +122,6 @@ The subagent review loop (dispatching a fresh agent to review plans/specs) doubl
 
 ### Bug Fixes
 
-- **Brainstorm server ESM fix** — renamed `server.js` → `server.cjs` so the brainstorming server starts correctly on Node.js 22+ where the root `package.json` `"type": "module"` caused `require()` to fail. (PR #784 by @sarbojitrana, fixes #774, #780, #783)
 - **Brainstorm owner-PID on Windows** — skip PID lifecycle monitoring on Windows/MSYS2 where the PID namespace is invisible to Node.js, preventing the server from self-terminating after 60 seconds. (#770, docs from PR #768 by @lucasyhzlu-debug)
 - **stop-server.sh reliability** — verify the server process actually died before reporting success. SIGTERM + 2s wait + SIGKILL fallback. (#723)
 
@@ -154,7 +148,6 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 ### Bug Fixes
 
 - **Verify server actually stopped** — `stop-server.sh` now confirms the process is dead before reporting success. SIGTERM + 2s wait + SIGKILL fallback. Reports failure if the process survives. (PR #751)
-- **Generic agent language** — brainstorm companion waiting page now says "the agent" instead of "Claude".
 
 ## v5.0.3 (2026-03-15)
 
@@ -192,7 +185,6 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 
 ### Subagent Context Isolation
 
-- All delegation skills (brainstorming, dispatching-parallel-agents, requesting-code-review, subagent-driven-development, writing-plans) now include context isolation principle
 - Subagents receive only the context they need, preventing context window pollution
 
 ## v5.0.1 (2026-03-10)
@@ -201,8 +193,6 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 
 **Brainstorm-server moved into skill directory**
 
-- Moved `lib/brainstorm-server/` → `skills/brainstorming/scripts/` per the [agentskills.io](https://agentskills.io) specification
-- All `${CLAUDE_PLUGIN_ROOT}/lib/brainstorm-server/` references replaced with relative `scripts/` paths
 - Skills are now fully portable across platforms — no platform-specific env vars needed to locate scripts
 - `lib/` directory removed (was the last remaining content)
 
@@ -219,14 +209,12 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 
 ### Improvements
 
-**Multi-platform brainstorm server launch**
 
 - Per-platform launch instructions in visual-companion.md: Claude Code (default mode), Codex (auto-foreground via `CODEX_CI`), Gemini CLI (`--foreground` with `is_background`), and fallback for other environments
 - Server now writes startup JSON to `$SCREEN_DIR/.server-info` so agents can find the URL and port even when stdout is hidden by background execution
 
 **Brainstorm server dependencies bundled**
 
-- `node_modules` vendored into the repo so the brainstorm server works immediately on fresh plugin installs without requiring `npm` at runtime
 - Removed `fsevents` from bundled deps (macOS-only native binary; chokidar falls back gracefully without it)
 - Fallback auto-install via `npm install` if `node_modules` is missing
 
@@ -253,7 +241,6 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 
 - Fixed Cursor install command in README: `/plugin-add` → `/add-plugin` (confirmed via Cursor 2.5 release announcement)
 
-**User review gate in brainstorming** (#565)
 
 - Added explicit user review step between spec completion and writing-plans handoff
 - User must approve the spec before implementation planning begins
@@ -290,7 +277,6 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 
 **Specs and plans directory restructured**
 
-- Specs (brainstorming output) now save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
 - Plans (writing-plans output) now save to `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - User preferences for spec/plan locations override these defaults
 - All internal skill references, test files, and example paths updated to match
@@ -306,25 +292,18 @@ Removed the "execute 3 tasks then stop for review" pattern. Plans now execute co
 
 **Slash commands deprecated**
 
-`/brainstorm`, `/write-plan`, and `/execute-plan` now show deprecation notices pointing users to the corresponding skills. Commands will be removed in the next major release.
 
 ### New Features
 
-**Visual brainstorming companion**
 
-Optional browser-based companion for brainstorming sessions. When a topic would benefit from visuals, the brainstorming skill offers to show mockups, diagrams, comparisons, and other content in a browser window alongside terminal conversation.
 
-- `lib/brainstorm-server/` — WebSocket server with browser helper library, session management scripts, and dark/light themed frame template ("Superpowers Brainstorming" with GitHub link)
-- `skills/brainstorming/visual-companion.md` — Progressive disclosure guide for server workflow, screen authoring, and feedback collection
 - Brainstorming skill adds a visual companion decision point to its process flow: after exploring project context, the skill evaluates whether upcoming questions involve visual content and offers the companion in its own message
 - Per-question decision: even after accepting, each question is evaluated for whether browser or terminal is more appropriate
-- Integration tests in `tests/brainstorm-server/`
 
 **Document review system**
 
 Automated review loops for spec and plan documents using subagent dispatch:
 
-- `skills/brainstorming/spec-document-reviewer-prompt.md` — Reviewer checks completeness, consistency, architecture, and YAGNI
 - `skills/writing-plans/plan-document-reviewer-prompt.md` — Reviewer checks spec alignment, task decomposition, file structure, and file size
 - Brainstorming dispatches spec reviewer after writing the design doc
 - Writing-plans includes chunk-based plan review loop after each section
@@ -334,10 +313,8 @@ Automated review loops for spec and plan documents using subagent dispatch:
 
 **Architecture guidance across the skill pipeline**
 
-Design-for-isolation and file-size-awareness guidance added to brainstorming, writing-plans, and subagent-driven-development:
 
 - **Brainstorming** — New sections: "Design for isolation and clarity" (clear boundaries, well-defined interfaces, independently testable units) and "Working in existing codebases" (follow existing patterns, targeted improvements only)
-- **Writing-plans** — New "File Structure" section: map out files and responsibilities before defining tasks. New "Scope Check" backstop: catch multi-subsystem specs that should have been decomposed during brainstorming
 - **SDD implementer** — New "Code Organization" section (follow plan's file structure, report concerns about growing files) and "When You're in Over Your Head" escalation guidance
 - **SDD code quality reviewer** — Now checks architecture, unit decomposition, plan conformance, and file growth
 - **Spec/plan reviewers** — Architecture and file size added to review criteria
@@ -408,7 +385,6 @@ This fix should dramatically improve superpowers skills compliance and should re
 
 **Brainstorming skill now enforces its workflow instead of describing it**
 
-Models were skipping the design phase and jumping straight to implementation skills like frontend-design, or collapsing the entire brainstorming process into a single text block. The skill now uses hard gates, a mandatory checklist, and a graphviz process flow to enforce compliance:
 
 - `<HARD-GATE>`: no implementation skills, code, or scaffolding until design is presented and user approves
 - Explicit checklist (6 items) that must be created as tasks and completed in order
@@ -418,7 +394,6 @@ Models were skipping the design phase and jumping straight to implementation ski
 
 **Using-superpowers workflow graph intercepts EnterPlanMode**
 
-Added an `EnterPlanMode` intercept to the skill flow graph. When the model is about to enter Claude's native plan mode, it checks whether brainstorming has happened and routes through the brainstorming skill instead. Plan mode is never entered.
 
 ### Fixed
 
@@ -566,9 +541,7 @@ New test suite in `tests/explicit-skill-requests/` that verifies Claude correctl
 
 **Slash commands now user-only**
 
-Added `disable-model-invocation: true` to all three slash commands (`/brainstorm`, `/execute-plan`, `/write-plan`). Claude can no longer invoke these commands via the Skill tool—they're restricted to manual user invocation only.
 
-The underlying skills (`superpowers:brainstorming`, `superpowers:executing-plans`, `superpowers:writing-plans`) remain available for Claude to invoke autonomously. This change prevents confusion when Claude would invoke a command that just redirects to a skill anyway.
 
 ## v4.0.1 (2025-12-23)
 
@@ -580,7 +553,6 @@ Fixed a confusing pattern where Claude would invoke a skill via the Skill tool, 
 
 - Added "How to Access Skills" section to `using-superpowers`
 - Changed "read the skill" → "invoke the skill" in instructions
-- Updated slash commands to use fully qualified skill names (e.g., `superpowers:brainstorming`)
 
 **Added GitHub thread reply guidance to receiving-code-review** (h/t @ralphbean)
 
@@ -654,9 +626,7 @@ Rewrote key skills using DOT/GraphViz flowcharts as the authoritative process de
 
 **Skill priority in using-superpowers**
 
-When multiple skills apply, process skills (brainstorming, debugging) now explicitly come before implementation skills. "Build X" triggers brainstorming first, then domain skills.
 
-**brainstorming trigger strengthened**
 
 Description changed to imperative: "You MUST use this before any creative work—creating features, building components, adding functionality, or modifying behavior."
 
@@ -723,7 +693,6 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 - **Improved Documentation**: Rewrote README to explain problem/solution clearly
   - Removed duplicate sections and conflicting information
-  - Added complete workflow description (brainstorm → plan → execute → finish)
   - Simplified platform installation instructions
   - Emphasized skill-checking protocol over automatic activation claims
 
@@ -739,14 +708,11 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 ### Improvements
 
-- Simplified `brainstorming` skill to return to original conversational vision. Removed heavyweight 6-phase process with formal checklists in favor of natural dialogue: ask questions one at a time, then present design in 200-300 word sections with validation. Keeps documentation and implementation handoff features.
 
 ## v3.3.1 (2025-10-28)
 
 ### Improvements
 
-- Updated `brainstorming` skill to require autonomous recon before questioning, encourage recommendation-driven decisions, and prevent agents from delegating prioritization back to humans.
-- Applied writing clarity improvements to `brainstorming` skill following Strunk's "Elements of Style" principles (omitted needless words, converted negative to positive form, improved parallel construction).
 
 ### Bug Fixes
 
@@ -837,10 +803,7 @@ These changes address observed agent behavior where they rationalize around skil
 
 ### New Features
 
-**Design documentation in brainstorming workflow**
-- Added Phase 4: Design Documentation to brainstorming skill
 - Design documents now written to `docs/plans/YYYY-MM-DD-<topic>-design.md` before implementation
-- Restores functionality from original brainstorming command that was lost during skill conversion
 - Documents written before worktree setup and implementation planning
 - Tested with subagent to verify compliance under time pressure
 
@@ -851,7 +814,6 @@ These changes address observed agent behavior where they rationalize around skil
 - Updated format: `superpowers:test-driven-development` (previously just `test-driven-development`)
 - Affects all REQUIRED SUB-SKILL, RECOMMENDED SUB-SKILL, and REQUIRED BACKGROUND references
 - Aligns with how skills are invoked using the Skill tool
-- Files updated: brainstorming, executing-plans, subagent-driven-development, systematic-debugging, testing-skills-with-subagents, writing-plans, writing-skills
 
 ### Improvements
 
@@ -864,7 +826,6 @@ These changes address observed agent behavior where they rationalize around skil
 
 ### Bug Fixes
 
-- **Fixed command syntax in README** (#44) - Updated all command references to use correct namespaced syntax (`/superpowers:brainstorm` instead of `/brainstorm`). Plugin-provided commands are automatically namespaced by Claude Code to avoid conflicts between plugins.
 
 ## v3.1.0 (2025-10-17)
 
@@ -872,13 +833,11 @@ These changes address observed agent behavior where they rationalize around skil
 
 **Skill names standardized to lowercase**
 - All skill frontmatter `name:` fields now use lowercase kebab-case matching directory names
-- Examples: `brainstorming`, `test-driven-development`, `using-git-worktrees`
 - All skill announcements and cross-references updated to lowercase format
 - This ensures consistent naming across directory names, frontmatter, and documentation
 
 ### New Features
 
-**Enhanced brainstorming skill**
 - Added Quick Reference table showing phases, activities, and tool usage
 - Added copyable workflow checklist for tracking progress
 - Added decision flowchart for when to revisit earlier phases
@@ -912,10 +871,8 @@ These changes address observed agent behavior where they rationalize around skil
 
 ### Bug Fixes
 
-- **Re-added missing command redirects** - Restored `commands/brainstorm.md` and `commands/write-plan.md` that were accidentally removed in v3.0 migration
 - Fixed `defense-in-depth` name mismatch (was `Defense-in-Depth-Validation`)
 - Fixed `receiving-code-review` name mismatch (was `Code-Review-Reception`)
-- Fixed `commands/brainstorm.md` reference to correct skill name
 - Removed references to non-existent related skills
 
 ### Documentation
@@ -1101,7 +1058,6 @@ If you have an existing installation:
 
 **Modified:**
 - `hooks/session-start.sh` - Use skills from ~/.config/superpowers/skills
-- `commands/brainstorm.md` - Updated paths to SUPERPOWERS_SKILLS_ROOT
 - `commands/write-plan.md` - Updated paths to SUPERPOWERS_SKILLS_ROOT
 - `commands/execute-plan.md` - Updated paths to SUPERPOWERS_SKILLS_ROOT
 - `README.md` - Complete rewrite for new architecture

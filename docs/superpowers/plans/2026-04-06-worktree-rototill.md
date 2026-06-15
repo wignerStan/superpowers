@@ -808,7 +808,6 @@ to:
 In `skills/writing-plans/SKILL.md`, change line 16 from:
 
 ```markdown
-**Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 ```
 
 to:
@@ -825,7 +824,6 @@ git commit -m "fix: update worktree integration references across skills (PRI-97
 
 Remove REQUIRED language from executing-plans and subagent-driven-development.
 Consent and detection now live inside using-git-worktrees itself.
-Fix stale 'created by brainstorming' claim in writing-plans."
 ```
 
 ---

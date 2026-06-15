@@ -259,7 +259,6 @@ The skill itself now handles consent (Step 0.5) and detection (Step 0), so calli
 
 #### `writing-plans`
 
-Remove the stale claim "should be run in a dedicated worktree (created by brainstorming skill)." Brainstorming is a design skill and does not create worktrees. The worktree prompt happens at execution time via `using-git-worktrees`.
 
 ### 4. Platform-Neutral Instruction File References
 
@@ -289,7 +288,6 @@ This applies to directory preference checks in Step 1b.
 | #238 | Direct fix (Bug #238) |
 | #1049 | Platform-neutral instruction file references |
 | #279 | Solved by detect-and-defer — native paths respected because we don't override them |
-| #574 | **Deferred.** Nothing in this spec touches the brainstorming skill where the bug lives. Full fix (adding a worktree step to brainstorming's checklist) is Phase 4. |
 
 ## Risks
 
@@ -339,4 +337,3 @@ The spec describes *what changes*; the implementation plan will specify exact ed
 ## Future Work (not in this spec)
 
 - **Phase 3 remainder:** `$TMPDIR` directory option (#666), setup docs for caching and env inheritance (#299)
-- **Phase 4:** PreToolUse hooks for path enforcement (#1040), per-worktree env conventions (#597), brainstorming checklist worktree step (#574), multi-repo documentation (#710)

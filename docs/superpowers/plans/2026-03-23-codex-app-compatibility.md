@@ -92,7 +92,6 @@ sandbox fallback for permission errors on git worktree add."
 Change lines 212-214 from:
 
 ```markdown
-- **brainstorming** (Phase 4) - REQUIRED when design is approved and implementation follows
 - **subagent-driven-development** - REQUIRED before executing any tasks
 - **executing-plans** - REQUIRED before executing any tasks
 ```
@@ -100,7 +99,6 @@ Change lines 212-214 from:
 To:
 
 ```markdown
-- **brainstorming** - REQUIRED: Ensures isolated workspace (creates one or verifies existing)
 - **subagent-driven-development** - REQUIRED: Ensures isolated workspace (creates one or verifies existing)
 - **executing-plans** - REQUIRED: Ensures isolated workspace (creates one or verifies existing)
 ```

@@ -153,7 +153,6 @@ already use it in another harness.
 
 ## The Basic Workflow
 
-1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
 
 2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
 
@@ -181,7 +180,6 @@ already use it in another harness.
 - **verification-before-completion** - Ensure it's actually fixed
 
 **Collaboration** 
-- **brainstorming** - Socratic design refinement
 - **writing-plans** - Detailed implementation plans
 - **executing-plans** - Batch execution with checkpoints
 - **dispatching-parallel-agents** - Concurrent subagent workflows

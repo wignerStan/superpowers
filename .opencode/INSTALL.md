@@ -45,7 +45,6 @@ Use OpenCode's native `skill` tool:
 
 ```
 use skill tool to list skills
-use skill tool to load superpowers/brainstorming
 ```
 
 ## Updating

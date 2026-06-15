@@ -79,14 +79,12 @@ A real integration loads the `using-superpowers` bootstrap at session start. The
 
 > Let's make a react todo list
 
-A working integration auto-triggers the `brainstorming` skill before any code is written. Paste the complete transcript in the PR.
 
 **These are not real integrations and will be closed:**
 
 - Manually copying skill files into the harness
 - Wrapping with `npx skills` or similar at-runtime shims
 - Anything that requires the user to opt in to skills per-session
-- Anything where `brainstorming` does not auto-trigger on the acceptance test above
 
 If you are not sure whether your integration loads the bootstrap at session start, it does not.
 

@@ -50,7 +50,6 @@ use skill tool to list skills
 ### Loading a Skill
 
 ```
-use skill tool to load superpowers/brainstorming
 ```
 
 ### Personal Skills
